@@ -1,0 +1,3 @@
+Found a JSON API to get electricy rate
+Store data in a SQL database
+
