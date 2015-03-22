@@ -52,8 +52,10 @@ class LTCMiningCalculator(MiningCalculator):
         self.cur2 = 'USD' # quote currency or counter currency
         self.pair = "{0}{1}".format(self.cur1, self.cur2) # BTCEUR BTCUSD
         url = "https://btc-e.com/api/2/{cur1}_{cur2}/ticker".format(cur1=self.cur1.lower(), cur2=self.cur2.lower())
-        json_data = urllib2.urlopen(url).read()
-        data = json.loads(json_data)
+        #json_data = urllib2.urlopen(url).read()
+        #data = json.loads(json_data)
+        r = requests.get(url)
+        data = r.json()        
         self.conversion_rate_cur1cur2 = float(data['ticker']['sell'])
         #self.conversion_rate_cur1cur2 = 1.25 # ToFix cur2 for 1 cur1 #counter_currency per base_currency
 
@@ -67,7 +69,8 @@ class LTCMiningCalculator(MiningCalculator):
         #self.current_difficulty = float(urllib2.urlopen('http://abe.john-edwin-tobey.org/chain/Bitcoin/q/getdifficulty').read())
         
         #self.block_reward_cur1 = 50 # ToFix
-        blockcount = int(urllib2.urlopen('http://explorer.litecoin.net/chain/Litecoin/q/getblockcount').read())
+        url = 'http://explorer.litecoin.net/chain/Litecoin/q/getblockcount'
+        blockcount = int(requests.get(url).text)
         self.block_reward_cur1 = self.reward(blockcount)
         
         #self.current_difficulty = 96.19595881 #ToFix
@@ -90,7 +93,8 @@ blockNumber,time,target,avgTargetSinceLast,difficulty,hashesToWin,avgIntervalSin
 START DATA
 329075,1365277569,131013658748435477164936169388574986983635210083111099862121185280,131013658748436269891309801177314810748808714944246301785889148798,205.779,883816926750,228,3876390030
 """
-        self.data = urllib2.urlopen('http://explorer.litecoin.net/chain/Litecoin/q/nethash/1/-3').read()
+        url = 'http://explorer.litecoin.net/chain/Litecoin/q/nethash/1/-3'
+        self.data = requests.get(url).text
 
         self.data = self.data.split('\n')
         self.data = self.data[len(self.data)-2]

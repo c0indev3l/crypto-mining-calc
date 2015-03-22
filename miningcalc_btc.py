@@ -51,23 +51,24 @@ class BTCMiningCalculator(MiningCalculator):
         self.cur1 = 'BTC' # base currency
         self.cur2 = 'USD' # quote currency or counter currency
         #self.pair = "{0}{1}".format(self.cur1, self.cur2) # BTCEUR BTCUSD
-        #url = "https://mtgox.com/api/1/{pair}/ticker".format(pair=self.pair)
-        url = "http://bitcoincharts.com/t/weighted_prices.json"
-        json_data = urllib2.urlopen(url).read()
-        data = json.loads(json_data)
+        url = "http://api.bitcoincharts.com/v1/weighted_prices.json"
+        r = requests.get(url)
+        data = r.json()
         #self.conversion_rate_cur1cur2 = float(data['return']['avg']['value'])
         self.conversion_rate_cur1cur2 = float(data[self.cur2]['24h'])
-
-
+        
         #conversion_rate_cur1cur2 = 22.79 #counter_currency per base_currency
         #self.conversion_rate_cur1cur2 = 1.0 # cur2 for 1 cur1
-
-
+        
         """
         block_reward_cur1 and current_difficulty
         """
-        self.block_reward_cur1 = float(urllib2.urlopen('http://blockexplorer.com/q/bcperblock').read())
-        self.current_difficulty = float(urllib2.urlopen('http://blockexplorer.com/q/getdifficulty').read())
+        url = 'http://blockexplorer.com/q/bcperblock'
+        #self.block_reward_cur1 = float(urllib2.urlopen(url).read())
+        self.block_reward_cur1 = float(requests.get(url).text)
+
+        url = 'http://blockexplorer.com/q/getdifficulty'
+        self.current_difficulty = float(requests.get(url).text)
 
         self.revenue_cur1_per_day = float(self.hash_rate_hash_per_s)*self.block_reward_cur1/self.current_difficulty*(60.0*60*24*(2**16-1)/(2**48))
         # maybe I should use arbitrary precision (libs such as decimal or mpmath)
